@@ -60,4 +60,6 @@ void borrar_linea(Version v, unsigned int nroLinea);
 
 void insertar_linea(Version v, char * texto, unsigned int nroLinea);
 
+Versiones tiene_padre(Versiones raiz, Versiones hija);
+
 #endif

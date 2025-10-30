@@ -84,7 +84,7 @@ Lineas borrar_linea_en_lista(Lineas ls, unsigned int nroLinea)
     }
 }
 
-bool son_iguales_en_lista(Lineas ls1, Lineas ls2)
+bool tienen_mismas_lineas(Lineas ls1, Lineas ls2)
 {
     if(isEmpty(ls1) && isEmpty(ls2))
         return true;
@@ -93,8 +93,18 @@ bool son_iguales_en_lista(Lineas ls1, Lineas ls2)
     else if(isEmpty(ls2))
         return false;
     else if (strcmp(texto_linea(head(ls1)), texto_linea(head(ls2))) == 0)
-        return son_iguales_en_lista(tail(ls1), tail(ls2));
+        return tienen_mismas_lineas(tail(ls1), tail(ls2));
     else
         return false;
+}
+
+Lineas destruir_lineas(Lineas ls)
+{
+    if (ls != NULL) {
+        destruir_lineas(ls->sig);
+        destruir_linea(ls->l); // lamada a funcion en linea.c
+        delete ls;
+    }
+    return NULL;
 }
 

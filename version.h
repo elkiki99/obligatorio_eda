@@ -2,7 +2,6 @@
 #define VERSION_H
 
 #include "lineas.h"
-
 #include "definiciones.h"
 
 typedef struct nodo_version * Version;
@@ -23,5 +22,11 @@ void imprimir_lineas(Version v);
 // imprimimos el texto
 
 bool son_iguales(Version v1, Version v2);
+
+void copiar_lineas(Version padre, Version hija);
+
+void imprimir_lineas_diferentes(Version padre, Version hija);
+
+Version destruir_version(Version v);
 
 #endif

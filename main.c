@@ -106,7 +106,7 @@ int main(){
 		}else if (strcasecmp (pch, "MostrarCambios") == 0){
 			pch = strtok (NULL, "( ,)\n");
 			if (pch != NULL){
-				retorno = MostrarCambios(a, pch);
+				retorno = MostrarCambios(a, pch, error);
 				ejecutado = true;
 			}else
 				cout << " - ERROR: Faltan Parametros.\n";

@@ -56,7 +56,7 @@ TipoRet BorrarLinea(Archivo &a, char * version, unsigned int nroLinea, char * er
 TipoRet MostrarTexto(Archivo a, char * version, char * error);
 // Esta función muestra el texto completo de la version, teniendo en cuenta los cambios realizados en dicha versión y en las versiones ancestras, de la cual ella depende.
 
-TipoRet MostrarCambios(Archivo a, char * version);
+TipoRet MostrarCambios(Archivo a, char * version, char * error);
 // Esta función muestra los cambios que se realizaron en el texto de la version parámetro, sin incluir los cambios realizados en las versiones ancestras de la cual dicha versión depende.
 
 TipoRet Iguales(Archivo a, char * version1, char * version2, bool &iguales, char * error);

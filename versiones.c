@@ -115,9 +115,9 @@ void versiones_destruir(Versiones &vs)
 	if (vs != NULL){
 		versiones_destruir(vs->ph);
 		versiones_destruir(vs->sh);
+        destruir_version(vs->v); // esta función está en version.c
 		delete vs;
 	}
-	vs = NULL;
 }
 
 bool versiones_insertar(Versiones &vs, char * path)
@@ -132,11 +132,10 @@ bool versiones_insertar(Versiones &vs, char * path)
         ant = NULL;
 
         // Determinamos 1er nodo
-        if (iter_padre == NULL) {
+        if (iter_padre == NULL)
             iter = vs;
-        } else {
+        else
             iter = iter_padre->ph;
-        }
 
         // Buscar posición correcta entre hermanos
         while (iter != NULL && num_version(iter->v) < act) {
@@ -146,33 +145,29 @@ bool versiones_insertar(Versiones &vs, char * path)
 
         // No estamos en el último nivel
         if (next_pch != NULL) {
-            if (iter != NULL && num_version(iter->v) == act) {
+            if (iter != NULL && num_version(iter->v) == act)
                 iter_padre = iter; // Bajamos un nivel
-            } else {
+            else
                 return false; // Padre no existe
-            }
         } else {
             // Último nivel
             // Validación para ver que no hayan huecos
-            int max= 0; // máxima version hermana
+            int max = 0; // máxima version hermana
 
-            if (iter_padre == NULL) {
+            if (iter_padre == NULL)
                 temp = vs;
-            } else {
+            else
                 temp = iter_padre->ph;
-            }
 
             while (temp != NULL) {
                 int n = num_version(temp->v);
-                if (n > max) {
+                if (n > max)
                     max = n;
-                }
                 temp = temp->sh;
             }
 
-            if (act > max + 1) {
+            if (act > max + 1)
                 return false; // No tengo hermano anterior a la versión que queremos insertar (ej, 1.3 pero no hay 1.2)
-            }
 
             // Correr hermanos si existen mayores
             if (iter != NULL && num_version(iter->v) >= act) {
@@ -185,16 +180,14 @@ bool versiones_insertar(Versiones &vs, char * path)
 
             // podemos crear nodo!
             aux = new nodo_versiones;
-            aux->v = crear_version(act);
+            aux->v = crear_version(act); // version implementada en version.c
             aux->ph = NULL;
             aux->sh = NULL;
 
-            // falta implementación. chequear si iter padre != NULL (es decir, la versión a insertar tiene padre)
             // chequear si la versión padre tiene lineas, y si tiene, copiarlas a la nueva versión
+            // si es la primer versión del nivel ( ej: 1, 2, 5, ..) omitimos este paso
             if(iter_padre != NULL)
-            {
-                if()
-            }
+                copiar_lineas(iter_padre->v, aux->v); // version padre, version actual, funcion version (impementada en version.c)
 
             // Insertar en orden entre hermanos
             if (ant == NULL) { // Primer hijo??
@@ -238,4 +231,20 @@ Versiones versiones_existe(Versiones vs, char * path)
         return act;
     } else
         return versiones_existe(act->ph, next_pch + 1);
+}
+
+Versiones tiene_padre(Versiones raiz, Versiones hija)
+{
+    if(raiz == NULL || raiz == hija) // si no hay raiz o es la hija (que pasamos por parámetro, es que no tiene padre o no hay)
+        return NULL;
+
+    if (raiz->ph == hija)
+        return raiz;
+
+    Versiones padre_en_hijos = tiene_padre(raiz->ph, hija);
+
+    if (padre_en_hijos != NULL)
+        return padre_en_hijos;
+
+    return tiene_padre(raiz->sh, hija);
 }

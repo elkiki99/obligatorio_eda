@@ -31,7 +31,9 @@ Lineas insertar_linea_en_lista(Lineas ls, Linea nueva, unsigned int nroLinea);
 
 Lineas borrar_linea_en_lista(Lineas ls, unsigned int nroLinea);
 
-bool son_iguales_en_lista(Lineas ls1, Lineas ls2);
+bool tienen_mismas_lineas(Lineas ls1, Lineas ls2);
 //pre: no se pasan valores null
+
+Lineas destruir_lineas(Lineas ls);
 
 #endif

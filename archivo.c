@@ -27,11 +27,10 @@ TipoRet BorrarArchivo(Archivo &a){
     // Elimina toda la memoria utilizada por el archivo y asigna NULL al puntero a.
     // Se asume como precondición que la referencia a un archivo (en particular a es distinto a NULL).
     // Esta operación se ejecuta al final de una sesión de trabajo con un archivo.
+    versiones_destruir(a->vs); // en versiones.c (destruye el arbol de versiones)
+    delete a;
 
-    // primero chequear que existan versiones. luego, hacer llamadas recursivas para eliminar las versiones, la version
-    // a la que apunta versiones, las lineas de cada version y la linea a la que apunta lineas para cada una de las versiones.
-
-	return NO_IMPLEMENTADA;
+	return OK;
 }
 
 TipoRet CrearVersion(Archivo &a, char * version, char * error)
@@ -59,7 +58,6 @@ TipoRet BorrarVersion(Archivo &a, char * version){
     // versiones, el versiones 1 apunta hacia la nueva a traves de siguiente hermano.
     // ahi me fijo si efectivamente es null (si no existe una version 2). entonces creo
     // si fuese 1.1, entonces tengo que entrar a versiones (1), y a su primer hijo y ver si es NULL. si es null, entonces creo.
-
 
 // Elimina una versión del archivo si la version pasada por parámetro existe. En otro caso la operación quedará sin efecto.
 // Si la versión a eliminar posee subversiones, éstas deberán ser eliminadas también, así como el texto asociado a cada una de las versiones.
@@ -158,10 +156,24 @@ TipoRet MostrarTexto(Archivo a, char * version, char * error){
     }
 }
 
-TipoRet MostrarCambios(Archivo a, char * version){
+TipoRet MostrarCambios(Archivo a, char * version, char * error){
 // Esta función muestra los cambios que se realizaron en el texto de la version parámetro, sin incluir los cambios realizados en las versiones ancestras de la cual dicha versión depende.
+    Versiones vs = versiones_existe(a->vs, version); // Existe la versión?
 
-	return NO_IMPLEMENTADA;
+    if(isEmpty(vs)) {
+        strcpy(error, "La versión no existe");
+        return ERROR;
+    }
+
+    // necesitamos al padre si es que la version no es padre (ej 1), para después imprimir lo que no aparece en el padre
+    Versiones padre = tiene_padre(a->vs, vs); // en version.c
+
+    if(padre == NULL) { // no tiene padre poqlo que podemos mostrar todo eltexto
+        imprimir_lineas(versiones_raiz(vs));
+    } else {
+        imprimir_lineas_diferentes(versiones_raiz(padre), versiones_raiz(vs)); // en version.c
+    }
+	return OK;
 }
 
 TipoRet Iguales(Archivo a, char * version1, char * version2, bool &iguales, char * error){
