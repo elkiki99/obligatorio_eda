@@ -9,31 +9,41 @@ Lineas crear_lineas();
 // Devuelve lista vacía
 
 Linea head(Lineas ls);
+// Pre: ls no vacía.
 // Devuelve la primera línea
 
 Lineas tail(Lineas ls);
+// Pre: ls no vacía.
 // Devuelve el resto de la lista
-
-bool isEmpty(Lineas ls);
-// Retorna true si la lista está vacía
 
 int cantidad_lineas(Lineas ls);
 // Cantidad de líneas en la lista
 
-void imprimir_lineas(Lineas ls);
-// Imprime todas las líneas
+bool isEmpty(Lineas ls);
+// retorna true si está vacía, false en caso contrario
 
-void imprimir_lineas_en_lista(Lineas ls);
+void imprimir_lineas(Lineas ls, unsigned int nroLinea);
+// imprime las lineas de una version
+
+void imprimir_lineas_con_il(Lineas ls, unsigned int nroLinea);
+// imprime lineas si la version es padre con "IL"
+
+void imprimir_lineas_diferentes(Lineas padre, Lineas hija, unsigned int nroLinea);
+// imprime las lineas diferentes de la hija con respecto a su padre
 
 int cantidad_lineas(Lineas ls);
+// imprime cantidad de lineas de la version
 
-Lineas insertar_linea_en_lista(Lineas ls, Linea nueva, unsigned int nroLinea);
+Lineas insertar_linea(Lineas ls, Linea nueva, unsigned int nroLinea);
+// inserta linea en la versión
 
-Lineas borrar_linea_en_lista(Lineas ls, unsigned int nroLinea);
+Lineas borrar_linea(Lineas ls, unsigned int nroLinea);
+// elimina la linea de la version y engancha correctamente (lista encadenada)
 
 bool tienen_mismas_lineas(Lineas ls1, Lineas ls2);
 //pre: no se pasan valores null
 
 Lineas destruir_lineas(Lineas ls);
+// elimina las lineas y libera el espacio
 
 #endif

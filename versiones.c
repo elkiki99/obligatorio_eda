@@ -14,27 +14,24 @@ struct nodo_versiones {
 	Versiones sh;
 };
 
-Versiones crear_versiones()
+Versiones crear()
 {
-    // Crea el árbol vacío de versiones
     return NULL;
 }
 
-Version versiones_raiz(Versiones vs)
+Version raiz(Versiones vs)
 {
-    // Retorna la raiz del árbol versiones.
-    // Pre: versiones es no vacio.
     return vs->v;
 }
 
-Versiones versiones_ph(Versiones vs)
+Versiones ph(Versiones vs)
 {
     // Retorna el primer hijo del árbol versiones.
     // Pre: versiones es no vacio.
     return vs->ph;
 }
 
-Versiones versiones_sh(Versiones vs)
+Versiones sh(Versiones vs)
 {
     // Retorna el siguiente del árbol versiones.
     // Pre: versiones es no vacio.
@@ -47,31 +44,42 @@ bool isEmpty(Versiones vs)
     return (vs == NULL);
 }
 
-int versiones_cantidad(Versiones vs)
+Versiones existe(Versiones vs, char * path)
+// Devuelve el nodo de versiones si existe, null caso contrario
 {
-    // Retorna la cardinalidad de versiones.
-    if(vs == NULL)
-        return 0;
-    else
-        return 1 + versiones_cantidad(vs->ph) + versiones_cantidad(vs->sh);
+    Versiones act = vs;
+    int num = atoi(path);
+
+    while (act != NULL && num_version(act->v) != num)
+        act = act->sh;
+
+    if (act == NULL)
+        return NULL; // no existe
+
+    // Seguimos al próximo número
+    char * next_pch = strchr(path, '.');
+
+    if (next_pch == NULL) {
+        // No hay más niveles
+        return act;
+    } else
+        return existe(act->ph, next_pch + 1);
 }
 
-int maximo(int x, int y)
+Versiones tiene_padre(Versiones raiz, Versiones hija)
 {
-    // Retorna el maximo de "x" e "y".
-    if(x > y)
-        return x;
-    else
-        return y;
-}
+    if(raiz == NULL || raiz == hija) // si no hay raiz o es la hija (que pasamos por parámetro, es que no tiene padre o no hay)
+        return NULL;
 
-int versiones_profundidad(Versiones vs)
-{
-    // Retorna la profundidad del árbol versiones.
-    if(vs == NULL)
-        return 0;
-    else
-        return maximo(1 + versiones_profundidad(vs->ph), versiones_profundidad(vs->sh));
+    if (raiz->ph == hija) // tiene padre y lo devolvemos
+        return raiz;
+
+    Versiones padre_en_hijos = tiene_padre(raiz->ph, hija); // llamada recursica
+
+    if (padre_en_hijos != NULL)
+        return padre_en_hijos;
+
+    return tiene_padre(raiz->sh, hija);
 }
 
 bool versiones_pertenece(Versiones vs, Version v)
@@ -85,28 +93,51 @@ bool versiones_pertenece(Versiones vs, Version v)
 		return (versiones_pertenece(vs->ph, v) || versiones_pertenece(vs->sh, v));
 }
 
-void versiones_imprimir_tree_aux(Versiones vs, int espacios, int padre)
+void imprimir_tree_aux(Versiones vs, int espacios, char * padre)
 {
-    // Imprime el árbol de versiones tabulado
-	if (vs != NULL){
-		for (int i = 0; i< espacios; i++)
-			cout << "   ";
+    if (vs != NULL) {
+        cout << "\t";
 
-		if(padre == 0)
-            cout << num_version(vs->v) << endl;
-        else
-            cout << padre << "." << num_version(vs->v) << endl;
+        for (int i = 0; i < espacios; i++)
+            cout << "   ";
 
-		versiones_imprimir_tree_aux(vs->ph, espacios + 1, num_version(vs->v)); // pasamos el número del padre al hijo
+        char * actual = new char[MAX_CONTENIDO];
+        actual[0] = '\0';
 
-		versiones_imprimir_tree_aux(vs->sh, espacios, padre); // mismo padre xa hermanos
-	}
+        char num[MAX_CONTENIDO]; // creamos num (aux)
+
+        sprintf(num, "%d", num_version(vs->v)); //copiamos en num el número actual de la versión
+
+        if (strlen(padre) == 0) { // si es el padre, imprimo el número actual
+            strcpy(actual, num);
+        } else {
+            strcpy(actual, padre);  // else, copio el padre (num) a actual
+            strcat(actual, ".");    // concateno punto
+            strcat(actual, num);    // concateno el actual
+        }
+
+        cout << actual << endl; // imprimo el actual (ej 1.2)
+
+        // función recursiva que imprime a los hijos
+        imprimir_tree_aux(vs->ph, espacios + 1, actual);
+
+        // función recursiva que imprime a los hermanos
+        imprimir_tree_aux(vs->sh, espacios, padre);
+
+        delete[] actual;
+    }
 }
 
-void versiones_imprimir_tree (Versiones vs)
+void imprimir_tree(Versiones vs)
 {
+    // definimos el numero de padre como ""
+    char * padre = new(char[MAX_CONTENIDO]);
+    padre[0] = '\0'; // inicializamos el caracter, sino a veces imprime contenido basura
+
     // Imprime el arbol de versiones tabulado
-	versiones_imprimir_tree_aux(vs, 3, 0);
+	imprimir_tree_aux(vs, 3, padre);
+
+	delete[] padre;
 }
 
 void versiones_destruir(Versiones &vs)
@@ -115,7 +146,7 @@ void versiones_destruir(Versiones &vs)
 	if (vs != NULL){
 		versiones_destruir(vs->ph);
 		versiones_destruir(vs->sh);
-        destruir_version(vs->v); // esta función está en version.c
+        destruir_version(vs->v); // esta función está en version.c, destruye el nodo a la versión
 		delete vs;
 	}
 }
@@ -211,40 +242,71 @@ bool versiones_insertar(Versiones &vs, char * path)
     return false;
 }
 
-Versiones versiones_existe(Versiones vs, char * path)
-// Devuelve el nodo de versiones si existe, null caso contrario
+void borrar_nodo_versiones(Versiones &vs, char * path)
 {
-    Versiones act = vs;
-    int num = atoi(path);
+    // esta función acepta la raíz del árbol versiones y la versión a eliminar
+    // pre: la versión a eliminar existe (!= NULL)
 
-    while (act != NULL && num_version(act->v) != num)
-        act = act->sh;
+    Versiones iter = vs, ant = NULL, iter_padre = NULL;
+    char *pch = strtok(path, ".");
+    //guarda el valor del path aqui para las llamadas recusrivas
+    char path_hijo[MAX_CONTENIDO];
+    int act;
 
-    if (act == NULL)
-        return NULL; // no existe
+    while (pch != NULL && iter != NULL) {
+        act = atoi(pch);
+        ant = NULL;
 
-    // Seguimos al próximo número
-    char * next_pch = strchr(path, '.');
+        // Buscar versión en el nivel actual
+        while (iter != NULL && num_version(iter->v) < act) {
+            ant = iter;
+            iter = iter->sh;
+        }
 
-    if (next_pch == NULL) {
-        // No hay más niveles
-        return act;
-    } else
-        return versiones_existe(act->ph, next_pch + 1);
+        char *next_pch = strtok(NULL, ".");
+
+        if (next_pch != NULL) {
+            // todavía no estamos en el último nivel asi que hay q bajar
+            iter_padre = iter;
+            iter = iter->ph;
+            pch = next_pch;
+        } else {
+            // estamos en el nivel: borrar nodo
+
+            // Si el nodo a borrar tiene hijos, hay qe eliminarlos recursivamente
+            if (iter->ph != NULL) {
+                while (iter->ph != NULL) {
+                    // sprintf
+                    sprintf(path_hijo, "%d", num_version(iter->ph->v)); //pasa de alpha a int (opuesto a atoi)
+                    borrar_nodo_versiones(iter->ph, path_hijo);
+                }
+            }
+            destruir_version(iter->v); // implementado en version.c (destruye version y lineas y linea)
+
+            // Ajustar punteros
+            if (ant == NULL) {
+                // Era el primer hijo del nivel
+                if (iter_padre != NULL)
+                    iter_padre->ph = iter->sh;
+                else
+                    vs = iter->sh;
+            } else {
+                ant->sh = iter->sh;
+            }
+
+            Versiones sh = iter->sh;
+            delete iter;
+
+            // renombrarmos los hermanos 1 numero menos
+            while(sh != NULL)
+            {
+                set_num_version(sh->v, num_version(sh->v) - 1);
+                sh = sh->sh;
+            }
+
+            return;
+        }
+    }
 }
 
-Versiones tiene_padre(Versiones raiz, Versiones hija)
-{
-    if(raiz == NULL || raiz == hija) // si no hay raiz o es la hija (que pasamos por parámetro, es que no tiene padre o no hay)
-        return NULL;
 
-    if (raiz->ph == hija)
-        return raiz;
-
-    Versiones padre_en_hijos = tiene_padre(raiz->ph, hija);
-
-    if (padre_en_hijos != NULL)
-        return padre_en_hijos;
-
-    return tiene_padre(raiz->sh, hija);
-}

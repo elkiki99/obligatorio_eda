@@ -21,11 +21,6 @@ Linea crear_linea(char * texto)
     return l;
 }
 
-bool isEmpty(Linea l)
-{
-    return (NULL == l);
-}
-
 // Retorna el texto de la línea
 char * texto_linea(Linea l)
 {
@@ -35,7 +30,7 @@ char * texto_linea(Linea l)
 void imprimir_texto(Linea l)
 {
     // Imprime el contenido de una línea
-    cout << texto_linea(l) << endl;
+    cout << "\t" << texto_linea(l) << endl;
 }
 
 void destruir_linea(Linea l)

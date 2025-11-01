@@ -29,7 +29,7 @@ TipoRet CrearVersion(Archivo &a, char * version, char * error);
 // - No pueden quedar “huecos” entre versiones hermanas. Por ejemplo, si creamos la versión 2.15.3, las versiones 2.15.1 y 2.15.2 ya deben existir.
 // Ver ejemplo en la letra.
 
-TipoRet BorrarVersion(Archivo &a, char * version);
+TipoRet BorrarVersion(Archivo &a, char * version, char * error);
 // Elimina una versión del archivo si la version pasada por parámetro existe. En otro caso la operación quedará sin efecto.
 // Si la versión a eliminar posee subversiones, éstas deberán ser eliminadas también, así como el texto asociado a cada una de las versiones.
 // No deben quedar números de versiones libres sin usar. Por lo tanto cuando se elimina una versión, las versiones hermanas que le siguen deben decrementar su numeración (así también sus subversiones dependientes). Por ejemplo, si existen las versiones 2.15.1, 2.15.2 y 2.15.3, y elimino la 2.15.1, la versión 2.15.2 y la 2.15.3 pasan a ser 2.15.1 y 2.15.2 respectivamente, esto incluye a todas las subversiones de estas versiones.

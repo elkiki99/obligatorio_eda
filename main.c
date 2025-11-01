@@ -63,7 +63,7 @@ int main(){
 		}else if (strcasecmp (pch, "BorrarVersion") == 0){
 			pch = strtok (NULL, "( ,)\n");
 			if (pch != NULL){
-				retorno = BorrarVersion(a, pch);
+				retorno = BorrarVersion(a, pch, error);
 				ejecutado = true;
 			}else
 				cout << " - ERROR: Faltan Parametros.\n";

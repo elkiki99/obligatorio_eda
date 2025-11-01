@@ -37,20 +37,10 @@ Lineas lineas(Version v)
     return v->ls;
 }
 
-void imprimir_lineas(Version v)
-{
-    imprimir_lineas_en_lista(lineas(v)); // función se encuentra en lineas.c
-}
-
-void insertar_linea(Version v, char * texto, unsigned int nroLinea)
+void crear_e_insertar_linea(Version v, char * texto, unsigned int nroLinea)
 {
     Linea nueva = crear_linea(texto);  // función en linea
-    v->ls = insertar_linea_en_lista(lineas(v), nueva, nroLinea); // funcion se encuentra en lineas.c
-}
-
-void borrar_linea(Version v, unsigned int nroLinea)
-{
-    v->ls = borrar_linea_en_lista(lineas(v), nroLinea); // función en lineas
+    v->ls = insertar_linea(lineas(v), nueva, nroLinea); // funcion se encuentra en lineas.c
 }
 
 bool son_iguales(Version v1, Version v2)
@@ -65,33 +55,20 @@ void copiar_lineas(Version padre, Version hija)
 
     while(aux != NULL)
     {
-        hija->ls = insertar_linea_en_lista(hija->ls, head(aux), i);
+        // creamos una nueva linea (diferente a la que estamos copiando), mismo contenido, dif puntero
+        Linea nueva = copiar_linea(head(aux));
+
+        hija->ls = insertar_linea(hija->ls, nueva, i);
         aux = tail(aux);
         i++;
     }
 }
 
-void imprimir_lineas_diferentes(Version padre, Version hija)
+Linea copiar_linea(Linea original)
 {
-    Lineas ls_padre = lineas(padre);
-    Lineas ls_hija = lineas(hija);
-
-    if(son_iguales(padre, hija)) {
-        cout << "No se realizaron modificaciones" << endl;
-        return;
-    }
-
-    // si llegamos hasta aca, tenemos por ejemplo ls_padre = 1.2.3 y ls_hija 1.2.3.4 por ejemplo y sabemos que no son iguales
-    while(ls_padre != NULL) { // avanzamos hasta que padre sea null, pero también avanzamos a la hija
-        ls_padre = tail(ls_padre);
-        ls_hija = tail(ls_hija);
-    }
-
-    while(ls_hija != NULL) // e imprimimos lo que quedó de la hija
-    {
-        imprimir_lineas_en_lista(ls_hija);
-        ls_hija = tail(ls_hija);
-    }
+    // Crear nueva lina con el mismo contenido q la linea original, devuelve la nueva linea (el puntero)
+    Linea nueva = crear_linea(texto_linea(original));
+    return nueva;
 }
 
 Version destruir_version(Version v)
